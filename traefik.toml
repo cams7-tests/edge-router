@@ -1,23 +1,33 @@
-logLevel = "INFO"
-
-[web]
-address = ":8080"
+defaultEntryPoints = ["http", "https"]
 
 [entryPoints]
   [entryPoints.http]
     address = ":80"
+    [entryPoints.http.redirect]
+      entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+        certFile = "/root/dev.cams7-job.ml.cert"
+        keyFile = "/root/dev.cams7-job.ml.key"
+      [[entryPoints.https.tls.certificates]]
+        certFile = "/root/traefik.cams7-job.ml.cert"
+        keyFile = "/root/traefik.cams7-job.ml.key"
+      [[entryPoints.https.tls.certificates]]
+        certFile = "/root/rabbitmq.cams7-job.ml.cert"
+        keyFile = "/root/rabbitmq.cams7-job.ml.key"
+      [[entryPoints.https.tls.certificates]]
+        certFile = "/root/registry.cams7-job.ml.cert"
+        keyFile = "/root/registry.cams7-job.ml.key"
+  [entryPoints.dashboard]
+    address = ":8080"
+    [entryPoints.dashboard.auth]
+      [entryPoints.dashboard.auth.basic]
+        users = ["admin:$2y$10$8LNjDcC//Cz8D02GqfVMY.T4Y1snWnzi5MKK4nuI02jfYgRXMYp/i"] #admin:admin
 
-[file]
-  [backends]
-    [backends.backend1]
-      [backends.backend1.loadbalancer]
-        method = "wrr"
-        sticky = true
-      [backends.backend1.servers.server1]
-        url = "http://front-end:8079"
+[api]
+  entrypoint="dashboard"
 
-  [frontends]
-    [frontends.frontend1]
-      backend = "backend1"
-      entrypoints = ["http"]
-
+[docker]
+  network = "sockshop"
